@@ -1,15 +1,11 @@
-inventory = 0
-quit = 0
 
 def get_valid_input():
     inventory = input("Enter a stock quantity: ")
-
+    
     if inventory == "quit":
         return "quit"
-
     if inventory.isdigit():
         return int(inventory)
-
     else:
         print("Error")
         return None
