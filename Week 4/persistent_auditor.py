@@ -29,10 +29,10 @@ def generate_report (total_units, failed_attempts):
     print("Total units:", total_units)
     print("Failed attempts:", failed_attempts)
 
-total_inventory = 0
 total_inventory = load_inventory()
 total_error = 0
 deliveries_processed = 0
+transaction_history = []
 
 while True:
     inventory = get_valid_input()
@@ -48,7 +48,9 @@ while True:
     total_inventory = process_delivery(total_inventory, inventory)
     tax = calculate_tax(inventory)
     deliveries_processed += 1
+    transaction_history.append(inventory)
 
+    print("Transaction history:", transaction_history)
     print(total_inventory)
     print("Tax:", tax)
 
