@@ -1,10 +1,17 @@
 def load_inventory():
     try:
         with open("inventory.txt", "r") as file:
-            total_inventory = int(file.read())
-            return total_inventory
+            total_inventory = int(file.readline())
+            history = file.readline().split(",")
+            transaction_history = [int(x) for x in history if x]
+            return total_inventory, transaction_history
     except FileNotFoundError:
-        return 0
+        return 0, []
+
+def save_inventory(total_inventory, transaction_history):
+    with open("inventory.txt", "w") as file:
+        file.write(str(total_inventory) + "\n")
+        file.write(",".join(str(x) for x in transaction_history))
     
 def get_valid_input():
     inventory = input("Enter a stock quantity: ")
@@ -29,15 +36,15 @@ def generate_report (total_units, failed_attempts):
     print("Total units:", total_units)
     print("Failed attempts:", failed_attempts)
 
-total_inventory = load_inventory()
+total_inventory, transaction_history = load_inventory()
 total_error = 0
 deliveries_processed = 0
-transaction_history = []
 
 while True:
     inventory = get_valid_input()
 
     if inventory == "quit":
+        save_inventory(total_inventory, transaction_history)
         generate_report(deliveries_processed, total_error)
         break
 
