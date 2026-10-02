@@ -6,19 +6,23 @@ FILENAME = "inventory.json"
 # DATA PERSISTENCE FUNCTIONS
 
 def load_inventory():
-    """Loads inventory from inventory.json if it exists, otherwise returns an empty list."""
     if os.path.exists(FILENAME):
         try:
             with open(FILENAME, "r") as file:
                 inventory = json.load(file)
-                print(f"\n{FILENAME} found.\nInventory loaded successfully.\n")
+                print(f"\n{FILENAME} found.")
+                print("Inventory loaded successfully.\n")
                 return inventory
         except (json.JSONDecodeError, IOError):
             print(f"\nError loading {FILENAME}. Starting with an empty inventory.\n")
             return []
     else:
-        print(f"\n{FILENAME} not found. Starting with an empty inventory.\n")
-        return []
+        print(f"\n{FILENAME} not found. Starting with default inventory.\n")
+        return [
+            {"id": "P001", "name": "Laptop", "price": 1200.00, "stock": 15},
+            {"id": "P002", "name": "Mouse", "price": 25.50, "stock": 40},
+            {"id": "P003", "name": "Keyboard", "price": 45.00, "stock": 25}
+        ]
 
 
 def save_inventory(inventory, is_exit=False):
@@ -136,14 +140,6 @@ def main():
     print("========================================")
 
     inventory = load_inventory()
-
-    if not inventory:
-        inventory = [
-            {"id": "P001", "name": "Laptop", "price": 1200.00, "stock": 15},
-            {"id": "P002", "name": "Mouse", "price": 25.50, "stock": 40},
-            {"id": "P003", "name": "Keyboard", "price": 45.00, "stock": 25},
-        ]
-        save_inventory(inventory)
 
     while True:
         print("\n----------- MENU -----------")
