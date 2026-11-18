@@ -3,12 +3,19 @@ import os
 import math
 
 from inventory import Inventory
+from supplier import Supplier
 from physical_product import PhysicalProduct
 from digital_product import DigitalProduct
+import supplier
 
 FILENAME = "inventory.json"
+def create_suppliers() -> dict[str, Supplier]:
+    return {
+        "S001": Supplier("S001", "TechSource Pte Ltd", "sales@techsource.com"),
+        "S002": Supplier("S002", "DigiWorks", "hello@digiworks.com"),
+    }
 
-def load_inventory():
+def load_inventory(suppliers: dict[str, Supplier]) -> Inventory:
     inventory = Inventory()
 
     if os.path.exists(FILENAME):
@@ -18,6 +25,7 @@ def load_inventory():
 
             for item in saved_products:
                 product_type = item.get("type", "physical")
+                supplier = suppliers[item.get("supplier_id", "S001")]
 
                 if product_type == "physical":
                     product = PhysicalProduct(
@@ -25,6 +33,7 @@ def load_inventory():
                         item["name"],
                         float(item["price"]),
                         int(item["stock"]),
+                        supplier,
                         float(item.get("weight", 0.0))
                     )
 
@@ -34,6 +43,7 @@ def load_inventory():
                         item["name"],
                         float(item["price"]),
                         int(item["stock"]),
+                        supplier,
                         float(item["download_size"])
                     )
 
@@ -52,10 +62,10 @@ def load_inventory():
     else:
         print("No inventory file found.")
         inventory.add_product(
-            PhysicalProduct("P001", "Laptop", 1200, 15, 2.0)
+            PhysicalProduct("P001", "Laptop", 1200, 15, suppliers["S001"], 2.0)
         )
         inventory.add_product(
-            DigitalProduct("D001", "eBook", 15, 50, 12.5)
+            DigitalProduct("D001", "eBook", 15, 50, suppliers["S002"], 12.5)
         )
 
     return inventory
@@ -75,7 +85,7 @@ def save_inventory(inventory, is_exit=False):
         print("\nFailed to save inventory to file.")
 
 
-def add_product(inventory):
+def add_product(inventory, suppliers):
     print("\nAdd New Product")
     print("1. Physical Product")
     print("2. Digital Product")
@@ -101,6 +111,12 @@ def add_product(inventory):
     if not name:
         print("Product name cannot be empty.")
         return
+        supplier_id = input(f"Supplier ID ({', '.join(suppliers)}): ").strip().upper()
+        supplier = suppliers.get(supplier_id)
+
+    if supplier is None:
+        print("Supplier not found.")
+        return
 
     try:
         price = float(input("Price: "))
@@ -118,7 +134,7 @@ def add_product(inventory):
                 return
 
             product = PhysicalProduct(
-                product_id, name, price, stock, weight
+                product_id, name, price, stock, supplier, weight    
             )
 
         else:
@@ -129,7 +145,7 @@ def add_product(inventory):
                 return
 
             product = DigitalProduct(
-                product_id, name, price, stock, download_size
+                product_id, name, price, stock, supplier, download_size
             )
 
     except ValueError:
@@ -184,7 +200,8 @@ def main():
     print("INVENTORY MANAGEMENT SYSTEM")
     print("========================================")
 
-    inventory = load_inventory()
+    suppliers = create_suppliers()
+    inventory = load_inventory(suppliers)
 
     while True:
         print("\n----------- MENU -----------")
